@@ -11,17 +11,24 @@ else
     Initialize()
 end
 ----Initialize Zenui----
-
 function freakboard:show()
-    
+    if IsValid(self.frame) then return end -- check if frame exist
+
+    self.frame = vgui.Create("ZenUI.Panel")
+    self.frame:SetSize(ScrW() / 2, ScrH() / 2)
+    self.frame:Center()
 end
 
 
 function freakboard:toggle(toggle)
     if toggle then
-        print("Opening")
+        self:show()
+        -- open
     else
-        print("Closing")
+        if IsValid(self.frame) then
+            self.frame:Remove()
+            self.frame = nil
+        end
     end
 end
 
