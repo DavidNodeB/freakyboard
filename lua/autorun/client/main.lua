@@ -1,43 +1,33 @@
-freakboard = freakboard or {}
+AddCSLuaFile("autorun/config.lua")
+freakboard = {}
 
-----Initialize Zenui----
--- local function Initialize()
---     -- print("ZenUI is guaranteed to be initialized here :D")
--- end
 
--- if !_G.ZenUI or !ZenUI.Loaded then
---     hook.Add("ZenUI_Loaded", "FreakyBoard_ZenUI_Loaded", Initialize)
--- else
---     Initialize()
--- end
-----Initialize Zenui----
+--[[
+Initialize Zenui
+local function Initialize()
+    print("ZenUI is guaranteed to be initialized here :D")
+end
 
-surface.CreateFont( "freakylexend", {
-	font = "Lexend", -- Use the font-name which is shown to you by your operating system Font Viewer.
-	extended = false,
-	size = 26,
-	weight = 550,
-	blursize = 0,
-	scanlines = 0,
-	antialias = true,
-	underline = false,
-	italic = false,
-	strikeout = false,
-	symbol = false,
-	rotary = false,
-	shadow = false,
-	additive = false,
-	outline = false,
-} )
+if !_G.ZenUI or !ZenUI.Loaded then
+    hook.Add("ZenUI_Loaded", "FreakyBoard_ZenUI_Loaded", Initialize)
+else
+    Initialize()
+end
+Initialize Zenui
+]] 
 
 function freakboard:show()
-    if IsValid(self.frame) then return end -- if frame exist exit func
+    if IsValid(self.frame) then return end 
+
+    local plyCount = "100 Players" 
+    local plyCountX = select(1, surface.GetTextSize(plyCount))
+
 
     self.frame = vgui.Create("DFrame")
     self.frame:SetSize(ScrW() / 2, ScrH() / 2 + 100)
     self.frame:Center()
     self.frame:SetTitle("")
-    self.frame:ShowCloseButton(false    )
+    self.frame:ShowCloseButton(false)
     self.frame:SetDraggable(false)
     self.frame:MakePopup()
     self.frame:SetKeyBoardInputEnabled(false)
@@ -49,36 +39,34 @@ function freakboard:show()
 
     
     self.plyCountLabel = vgui.Create("DLabel", self.frame)
-    self.plyCountLabel:SetText(player.GetCount() .. " Players ")    
-    self.plyCountLabel:SetPos(210, 4)
-    self.plyCountLabel:SetFont("freakylexend")
-    self.labelWidth = select(1, self.plyCountLabel:GetTextSize()) -- select(1) just gets the width value 
-    self.plyCountLabel:SetSize(self.labelWidth, 0)
+    self.plyCountLabel:SetText("")    
+    self.plyCountLabel:SetPos(210, 5)
+    self.plyCountLabel:SetFont(freaky_config.font)
+    self.plyCountLabel:SetSize(plyCountX + 8) -- error
     self.plyCountLabel:SetAutoStretchVertical(true)
-    
-    print(self.labelWidth)
-
-    self.plyCountLabel.Paint = function (self, w, h)
-        draw.RoundedBox(4, 0, 0, w, h, Color(100, 100, 100, 255))
-    end
-
-    -- makes board clickable without stoping ply
-    -- https://gmodwiki.com/Panel:SetMouseInputEnabled
-
-    -- for _, v in ipairs( player.GetAll() ) do
-    --     self.plyCountLabel:SetText(pla)
-    -- end
 
     self.frame.Paint = function (self, w, h)
-        draw.RoundedBox(4, 0, 0, w, h, Color(25, 25, 25, 255))
-        draw.DrawText( "OracleRP - Scoreboard", "freakylexend", 15, 0, Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT )
+        draw.RoundedBox(4, 0, 0, w, h, freaky_config.primaryColor)
+        draw.DrawText( freaky_config.scoreboardTitle, freaky_config.font, 15, 5, white, TEXT_ALIGN_LEFT )
     end
+    
+    self.plyCountLabel.Paint = function (self, w, h)
+        draw.RoundedBox(4, 0, 0, w, h, freaky_config.secondaryColor)
+        draw.DrawText( plyCount, freaky_config.font, ((plyCountX + 8) - plyCountX) / 2, 0, freaky_config.cyanColor)
+    end
+
+
+    --[[ 
+    this calculation is just
+    box width - text width / 2
+    example is 88px - 83px is 5px but / 2 gives us the center
+    ((plyCountX + 5) - plyCountX) / 2 
+    ]]
 end
 
 function freakboard:hide()
     self.frame:Remove()
 end
-
 
 function freakboard:toggle(toggle)
     if toggle then
